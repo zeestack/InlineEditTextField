@@ -1,23 +1,73 @@
-import logo from './logo.svg';
-import './App.css';
+/* 
+Inline editing textfiled using Material UI InputBase Component
+Author: Zahid Hussain
+Dated: Feb 24, 2021
+ */
+
+import React from "react";
+import "./App.css";
+import InlineText from "./components/InlineText";
+import Typography from "@material-ui/core/Typography";
 
 function App() {
+  const [text, setText] = React.useState("Zahid Hussain");
+
+  const main = {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: "12px",
+  };
+
+  const container = {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    margin: "12px",
+  };
+
+  const item = {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <div style={main}>
+      <Typography
+        variant="body1"
+        color="primary"
+        style={{ marginRight: "12px" }}
+      >
+        Inline TextField Example (maxLength: 25 Characters)
+      </Typography>
+
+      <div style={container}>
+        <Typography
+          variant="body1"
+          color="primary"
+          style={{ marginRight: "12px" }}
         >
-          Learn React
-        </a>
-      </header>
+          Enter Text:
+        </Typography>
+        <div style={item}>
+          <InlineText
+            value={text}
+            fontSize={"18px"}
+            color="blue"
+            maxLength={25}
+            onSave={({ value }) => {
+              setText(value);
+            }}
+          />
+        </div>
+      </div>
+      <Typography variant="h6" color="initial">
+        {`You have entered: ${text} - (Characters: ${text.length})`}
+      </Typography>
     </div>
   );
 }
