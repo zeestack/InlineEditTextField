@@ -4,9 +4,11 @@ Author: Zahid Hussain
 Dated: Feb 24, 2021
  */
 
-import React, { useState, useEffect, createRef } from "react";
-import { InputBase } from "@material-ui/core";
+import React, { useState, useEffect, useRef } from "react";
+import { InputBase, InputAdornment, IconButton } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
+import UnfoldLessIcon from "@material-ui/icons/UnfoldLess";
+import UnfoldMoreIcon from "@material-ui/icons/UnfoldMore";
 
 const InlineInput = withStyles((theme) => ({
   root: {
@@ -17,7 +19,7 @@ const InlineInput = withStyles((theme) => ({
     width: (props) => props.width || "100%",
   },
   input: {
-    overflow: "hidden",
+    overflow: (props) => props.overflow || "hidden",
     "&:focus": {
       border: "1px dashed lightblue",
     },
@@ -28,14 +30,23 @@ const InlineText = (props) => {
   const {
     id,
     value,
-    maxLength,
+    maxLength = null,
     size,
+    spellCheck = false,
     onSave = () => {},
     onClick = () => {},
+    onFocus = () => {},
+    rows,
+    more = false,
+    maxLengthBeforeMore = 150,
     ...rest
   } = props;
   const [text, setText] = useState(value);
-  const ref = createRef(InlineInput);
+
+  const [editting, setEditting] = useState(false);
+  const [showMore, setMore] = useState(false);
+
+  const ref = useRef(InlineInput);
 
   useEffect(() => {
     setText(value);
@@ -43,15 +54,18 @@ const InlineText = (props) => {
 
   const handleChange = (e) => {
     e.stopPropagation();
-    let { value } = e.target;
-    console.log(maxLength);
-    if (value.length > maxLength) return;
-    setText(e.target.value);
+    const { value } = e.target;
+    if (maxLength) {
+      if (value.length > maxLength) return;
+    }
+    setText(value);
   };
 
   const handleSave = (e) => {
     e.stopPropagation();
     onSave({ id, value: text });
+    setEditting(false);
+    setMore(false);
   };
 
   return (
@@ -61,16 +75,32 @@ const InlineText = (props) => {
       size={size || "small"}
       value={text}
       autoComplete="off"
-      onChange={(e) => handleChange(e)}
-      onBlur={handleSave}
-      onMouseLeave={(e) => {
-        e.stopPropagation();
-        ref.current.blur();
+      onChange={(e) => {
+        handleChange(e);
       }}
+      onBlur={handleSave}
       onClick={(e) => {
         e.stopPropagation();
         onClick(e);
       }}
+      onFocus={(e) => {
+        e.stopPropagation();
+        setEditting(true);
+        onFocus();
+      }}
+      inputProps={{ spellCheck: spellCheck ? "true" : "false" }}
+      rows={more && showMore ? undefined : rows}
+      endAdornment={
+        !editting &&
+        more &&
+        text.length > maxLengthBeforeMore && (
+          <InputAdornment position="end">
+            <IconButton onClick={() => setMore(!showMore)}>
+              {showMore ? <UnfoldLessIcon /> : <UnfoldMoreIcon />}
+            </IconButton>
+          </InputAdornment>
+        )
+      }
       {...rest}
     />
   );
